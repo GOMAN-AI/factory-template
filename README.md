@@ -136,6 +136,34 @@ merges red. Agents never push to `main`; the pre-push hook already refuses it.
 The rules every agent follows, and every command with its flags, are in
 [AGENTS.md](AGENTS.md); each command also explains itself with `--help`.
 
+## Build the CRM
+
+The CRM grows from a backlog of small, ordered issues. Build the first ones
+yourself to see every gate, then let the factory build the rest.
+
+1. **File the backlog.** In Claude Code, `/crm-backlog --dry-run` lists the
+   issues it would file and what each one depends on; `/crm-backlog` files
+   them, labelled `crm`, each with an `after:` line for every issue it needs
+   first. Running it again skips what already exists.
+2. **Build one or two by hand.** Pick an issue with no `after:` line and run
+   `/work <issue number>`, or start an Orca workspace from the issue's URL.
+   Answer its questions, approve the design and the plan, then review and
+   merge the pull request yourself.
+3. **Hand the rest to the factory.** Run `/factory crm`. It starts a
+   `/work <issue number> --auto` worker for each issue whose dependencies
+   are merged, each in its own Orca workspace and stack, up to your slot
+   limit (`FACTORY_SESSION_SLOTS`, default 3). Workers run on Sonnet and
+   decide at the gates themselves; every check still applies. The factory
+   merges each pull request once every check is green, starts the issues it
+   unblocked and prints a status table as it goes. An issue that stays red
+   or that a worker escalates is left for you, with its workspace and the
+   reason.
+
+Before step 3, `bin/doctor` must show Orca installed and Claude Code's auto
+permission mode `ok`: nobody is there to answer a permission prompt. Several
+workers at once also use your Claude plan and your GitHub Actions minutes
+faster than one session does.
+
 ## Repository map
 
 | Path | What lives there |
